@@ -1,13 +1,14 @@
 const Bottleneck = require('bottleneck');
-const getTcgUri = require('./getTcgUri');
 
 /**
- * Grabs all the purchase links for a list of cards by their _id
- * @param {Array} cards - Array of cards, freshly retrieved from our database
+ * Iterates over an array of cards, executing throttled callbacks based on a config object
+ * @param {Array} data - Array of cards to work on
+ * @param {Object} bnConfig - The config object for bottleneck
+ * @param {Function} fn - The function to throttle
  */
-async function getAllPurchaseLinks(cards) {
+async function throttleCardRequests({ data, bnConfig, fn }) {
     try {
-        const limiter = new Bottleneck({ maxConcurrent: 1, minTime: 125 }); // 8 requests per second
+        const limiter = new Bottleneck(bnConfig);
 
         // Assign a callback to the 'failed' job event; called every time a job fails
         limiter.on('failed', async (err, jobInfo) => {
@@ -24,9 +25,9 @@ async function getAllPurchaseLinks(cards) {
 
         limiter.on('done', (info) => console.log(limiter.counts())); // Log the limiter queue information
 
-        const throttled = limiter.wrap(getTcgUri); // Wrap the callback using the limiter to throttle
+        const throttled = limiter.wrap(fn); // Wrap the callback using the limiter to throttle
 
-        const resolveAllLinks = cards.map(card => throttled(card._id)); // Create the list of Promises
+        const resolveAllLinks = data.map(card => throttled(card)); // Create the list of Promises
 
         return await Promise.all(resolveAllLinks); // Resolve everything
     } catch (e) {
@@ -34,4 +35,4 @@ async function getAllPurchaseLinks(cards) {
     }
 }
 
-module.exports = getAllPurchaseLinks;
+module.exports = throttleCardRequests;

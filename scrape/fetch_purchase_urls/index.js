@@ -1,7 +1,8 @@
 const getCollectionCount = require('../common/getCollectionCount');
 const getCards = require('../common/getCards');
-const getAllPurchaseLinks = require('./getAllPurchaseLinks');
+const throttleCardRequests = require('../common/throttleCardRequests');
 const persistPurchaseLinks = require('./persistPurchaseLinks');
+const getTcgUri = require('./getTcgUri');
 const BATCH_SIZE = 100;
 
 /**
@@ -14,7 +15,13 @@ async function init() {
 
         for (let i = 0; i < numDocuments; i += BATCH_SIZE) { // Loop over the documents
             const cards = await getCards(i, BATCH_SIZE); // In small batch sizes
-            const links = await getAllPurchaseLinks(cards);
+
+            const links = await throttleCardRequests({
+                data: cards,
+                bnConfig: { maxConcurrent: 1, minTime: 125 },
+                fn: getTcgUri
+            });
+
             await persistPurchaseLinks(links);
         }
 
