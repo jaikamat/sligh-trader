@@ -12,8 +12,8 @@ async function init() {
         console.time('Purchase link scrape');
         const numDocuments = await getCollectionCount(); // Total number in collection
 
-        for (let i = 0; i < numDocuments; i += BATCH_SIZE) {
-            const cards = await getAllCards(i, BATCH_SIZE);
+        for (let i = 0; i < numDocuments; i += BATCH_SIZE) { // Loop over the documents
+            const cards = await getAllCards(i, BATCH_SIZE); // In small batch sizes
             const links = await getAllPurchaseLinks(cards);
             await persistPurchaseLinks(links);
         }
