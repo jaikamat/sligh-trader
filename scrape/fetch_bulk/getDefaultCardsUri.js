@@ -9,7 +9,7 @@ async function getDefaultCardsUri() {
     try {
         const { data } = await axios.get(BULK_DATA_URL);
         const defaultCards = data.data.find(o => o.type === 'default_cards');
-        return defaultCards.permalink_uri;
+        return defaultCards.download_uri;
     } catch (e) {
         throw e;
     }
