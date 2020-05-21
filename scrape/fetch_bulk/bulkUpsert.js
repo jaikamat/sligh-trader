@@ -6,6 +6,22 @@ const ScryfallCard = require('./ScryfallCard');
 const { MONGO_URI } = process.env;
 
 /**
+ * Creates a bulk update operation object
+ * @param {Object} card - Instance of ScryfallCard
+ */
+function createBulkOp(card) {
+    return {
+        updateOne: {
+            filter: { _id: card._id },
+            update: {
+                $set: { ...card }
+            },
+            upsert: true
+        }
+    }
+}
+
+/**
  * Upserts bulk cards from Scryfall into Mongo
  * @param {Array} data - the bulk list of default cards from Scryfall to be upserted 
  */
@@ -22,17 +38,7 @@ async function bulkUpsert(data) {
 
         const bulkOps = data
             .map(d => new ScryfallCard(d))
-            .map(d => {
-                return {
-                    updateOne: {
-                        filter: { _id: d._id },
-                        update: {
-                            $set: { ...d }
-                        },
-                        upsert: true
-                    }
-                }
-            });
+            .map(createBulkOp);
 
         const total = bulkOps.length;
 

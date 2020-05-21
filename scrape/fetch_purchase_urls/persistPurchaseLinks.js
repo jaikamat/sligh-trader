@@ -6,6 +6,21 @@ const COLLECTION = 'scryfall_bulk_cards';
 const BATCH_SIZE = 1000;
 
 /**
+ * Creates a bulk update operation object
+ * @param {Object} param0 - Contains the Scryfall ID and purchase link
+ */
+function createBulkOp({ id, tcg_uri }) {
+    return {
+        updateOne: {
+            filter: { _id: id },
+            update: {
+                $set: { 'purchase_urls.tcg': tcg_uri }
+            }
+        }
+    }
+}
+
+/**
  * Upserts TCG price link data to the scryfall_bulk_cards collection
  * @param {Array} data - List of objects with id and tcg_uri pairs
  */
@@ -17,16 +32,7 @@ async function persistPurchaseLinks(data) {
         console.log('Connected to Mongo');
         console.time('Purchase URL bulk write time');
 
-        const bulkOps = data.map(({ id, tcg_uri }) => {
-            return {
-                updateOne: {
-                    filter: { _id: id },
-                    update: {
-                        $set: { 'purchase_urls.tcg': tcg_uri }
-                    }
-                }
-            }
-        });
+        const bulkOps = data.map(createBulkOp);
 
         const total = bulkOps.length;
 
