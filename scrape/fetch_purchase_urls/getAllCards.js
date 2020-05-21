@@ -5,10 +5,12 @@ const COLLECTION = 'scryfall_bulk_cards';
 const DB_NAME = 'test';
 
 /**
- * Retreives all cards from the Mongo DB - TODO: Speed this up with streams
+ * Retrieves all cards from the Mongo DB - TODO: Speed this up with streams
  * Reference here: http://mongodb.github.io/node-mongodb-native/2.0/api/Cursor.html#stream
+ * @param {Integer} skip - The number of documents to skip over
+ * @param {Integer} limit - Max number of documents to be returned
  */
-async function getAllCards() {
+async function getAllCards(skip = 0, limit = 0) { // limit(0) is equivalent to setting no limit
     const mongoSettings = { useNewUrlParser: true, useUnifiedTopology: true };
     console.time('getAllCards');
 
@@ -20,6 +22,8 @@ async function getAllCards() {
             .db(DB_NAME)
             .collection(COLLECTION)
             .find({})
+            .skip(skip)
+            .limit(limit)
             .project({ _id: 1 })
             .toArray();
 

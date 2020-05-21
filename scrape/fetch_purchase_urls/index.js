@@ -1,7 +1,8 @@
 const getAllCards = require('./getAllCards');
 const getAllPurchaseLinks = require('./getAllPurchaseLinks');
 const persistPurchaseLinks = require('./persistPurchaseLinks');
-const BATCH_SIZE = 500;
+const getCollectionCount = require('./getCollectionCount');
+const BATCH_SIZE = 100;
 
 /**
  * Fetches all cards from the db, scrapes scryfall for their purchase URIs, then persists them
@@ -9,11 +10,11 @@ const BATCH_SIZE = 500;
 async function init() {
     try {
         console.time('Purchase link scrape');
-        const cards = await getAllCards(); // Do we need to grab everyting? Maybe grab the count() and iterate over it further batches
+        const numDocuments = await getCollectionCount(); // Total number in collection
 
-        while (cards.length > 0) {
-            const splice = cards.splice(0, BATCH_SIZE);
-            const links = await getAllPurchaseLinks(splice);
+        for (let i = 0; i < numDocuments; i += BATCH_SIZE) {
+            const cards = await getAllCards(i, BATCH_SIZE);
+            const links = await getAllPurchaseLinks(cards);
             await persistPurchaseLinks(links);
         }
 
