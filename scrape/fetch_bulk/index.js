@@ -1,5 +1,6 @@
 const getDefaultCardsUri = require('./getDefaultCardsUri');
 const getBulkJSON = require('./getBulkJSON');
+const filterBulk = require('./filterBulk');
 const bulkUpsert = require('./bulkUpsert');
 
 /**
@@ -9,7 +10,8 @@ async function init() {
     try {
         const bulkUri = await getDefaultCardsUri(); // Get the URI for the bulk
         const bulkCards = await getBulkJSON(bulkUri); // Reteive the data
-        await bulkUpsert(bulkCards); // Push it to Mongo
+        const filteredCards = filterBulk(bulkCards); // Remove non-paper cards
+        await bulkUpsert(filteredCards); // Push it to Mongo
     } catch (e) {
         throw e;
     }
