@@ -1,18 +1,18 @@
-require('dotenv').config();
+require('dotenv').config({ path: '../.env' });
 const MongoClient = require('mongodb').MongoClient;
 const { MONGO_URI } = process.env;
-const COLLECTION = 'scryfall_bulk_cards';
-const DB_NAME = 'test';
+const { COLLECTION } = process.env;
+const { DB_NAME } = process.env;
 
 /**
- * Retrieves all cards from the Mongo DB - TODO: Speed this up with streams
+ * Retrieves cards from Mongo DB - TODO: Speed this up with streams
  * Reference here: http://mongodb.github.io/node-mongodb-native/2.0/api/Cursor.html#stream
  * @param {Integer} skip - The number of documents to skip over
  * @param {Integer} limit - Max number of documents to be returned
  */
-async function getAllCards(skip = 0, limit = 0) { // limit(0) is equivalent to setting no limit
+async function getCards(skip = 0, limit = 0, query = {}) { // limit(0) is equivalent to setting no limit
     const mongoSettings = { useNewUrlParser: true, useUnifiedTopology: true };
-    console.time('getAllCards');
+    console.time('getCards');
 
     try {
         var client = await MongoClient.connect(MONGO_URI, mongoSettings);
@@ -21,7 +21,7 @@ async function getAllCards(skip = 0, limit = 0) { // limit(0) is equivalent to s
         return await client
             .db(DB_NAME)
             .collection(COLLECTION)
-            .find({})
+            .find(query)
             .skip(skip)
             .limit(limit)
             .project({ _id: 1 })
@@ -32,8 +32,8 @@ async function getAllCards(skip = 0, limit = 0) { // limit(0) is equivalent to s
     } finally {
         await client.close();
         console.log('Disconnected from Mongo');
-        console.timeEnd('getAllCards');
+        console.timeEnd('getCards');
     }
 }
 
-module.exports = getAllCards;
+module.exports = getCards;

@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ path: '../.env' });
 const axios = require('axios');
 const { SF_API } = process.env;
 
@@ -14,6 +14,3 @@ async function getTcgUri(scryfallId) {
 }
 
 module.exports = getTcgUri;
-
-// Get all the data, then once all the bottlenecked promises resolve, bulk update the scryfall_bulk cards by $setting the cardID's purchase URI
-// NOTE: REMEMBER to turn off upsert, only want to affect card objects, not make new entries

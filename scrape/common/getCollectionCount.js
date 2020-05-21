@@ -1,8 +1,8 @@
-require('dotenv').config();
+require('dotenv').config({ path: '../.env' });
 const MongoClient = require('mongodb').MongoClient;
 const { MONGO_URI } = process.env;
-const COLLECTION = 'scryfall_bulk_cards';
-const DB_NAME = 'test';
+const { COLLECTION } = process.env;
+const { DB_NAME } = process.env;
 
 async function getCollectionCount() {
     const mongoSettings = { useNewUrlParser: true, useUnifiedTopology: true };

@@ -1,7 +1,7 @@
-const getAllCards = require('./getAllCards');
+const getCollectionCount = require('../common/getCollectionCount');
+const getCards = require('../common/getCards');
 const getAllPurchaseLinks = require('./getAllPurchaseLinks');
 const persistPurchaseLinks = require('./persistPurchaseLinks');
-const getCollectionCount = require('./getCollectionCount');
 const BATCH_SIZE = 100;
 
 /**
@@ -13,7 +13,7 @@ async function init() {
         const numDocuments = await getCollectionCount(); // Total number in collection
 
         for (let i = 0; i < numDocuments; i += BATCH_SIZE) { // Loop over the documents
-            const cards = await getAllCards(i, BATCH_SIZE); // In small batch sizes
+            const cards = await getCards(i, BATCH_SIZE); // In small batch sizes
             const links = await getAllPurchaseLinks(cards);
             await persistPurchaseLinks(links);
         }
