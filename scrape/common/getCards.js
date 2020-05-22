@@ -24,7 +24,7 @@ async function getCards(skip = 0, limit = 0, query = {}) { // limit(0) is equiva
             .find(query)
             .skip(skip)
             .limit(limit)
-            .project({ _id: 1, purchase_urls: 1 })
+            .project({ _id: 1, purchase_urls: 1, tcgplayer_id: 1 })
             .toArray();
 
     } catch (e) {

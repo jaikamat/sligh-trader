@@ -2,30 +2,13 @@ require('dotenv').config({ path: '../.env' });
 const MongoClient = require('mongodb').MongoClient;
 const { COLLECTION } = process.env;
 const { DB_NAME } = process.env;
-const ScryfallCard = require('./ScryfallCard');
 const { MONGO_URI } = process.env;
 
 /**
- * Creates a bulk update operation object
- * @param {Object} card - Instance of ScryfallCard
+ * Performs a bulk operation on the database
+ * @param {Array} bulkOps - the bulk operations to be executed
  */
-function createBulkOp(card) {
-    return {
-        updateOne: {
-            filter: { _id: card._id },
-            update: {
-                $set: { ...card }
-            },
-            upsert: true
-        }
-    }
-}
-
-/**
- * Upserts bulk cards from Scryfall into Mongo
- * @param {Array} data - the bulk list of default cards from Scryfall to be upserted 
- */
-async function bulkUpsert(data) {
+async function bulkUpsert(bulkOps) {
     const mongoSettings = { useNewUrlParser: true, useUnifiedTopology: true };
     const BATCH_SIZE = 1000;
 
@@ -35,10 +18,6 @@ async function bulkUpsert(data) {
         console.time('Bulk write time');
 
         const db = await client.db(DB_NAME);
-
-        const bulkOps = data
-            .map(d => new ScryfallCard(d))
-            .map(createBulkOp);
 
         const total = bulkOps.length;
 
