@@ -12,7 +12,7 @@ async function init() {
     try {
         console.time('Purchase link scrape');
         const numDocuments = await getCollectionCount(); // Total number in collection
-        let errors = 0; // TODO: Remove this, log errors correctly
+        let errors = 0;
 
         for (let i = 0; i < numDocuments; i += BATCH_SIZE) { // Loop over the documents
             try {
