@@ -24,7 +24,8 @@ class ScryfallCard {
         rarity,
         artist,
         colors,
-        image_uris
+        image_uris,
+        tcgplayer_id
     }) {
         this._id = id;
         this.name = name;
@@ -41,6 +42,7 @@ class ScryfallCard {
         this.rarity = rarity;
         this.artist = artist;
         this.image_uris = image_uris;
+        this.tcgplayer_id = tcgplayer_id;
     }
 }
 
